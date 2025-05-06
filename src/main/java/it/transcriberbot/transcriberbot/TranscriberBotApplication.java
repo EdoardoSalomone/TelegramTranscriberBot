@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,15 +18,18 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Slf4j
 public class TranscriberBotApplication {
 
+    @Value("${telegrambots.botUsername}")
+    private String botUsername;
+
+    @Value("${telegrambots.botToken}")
+    private String botToken;
 
     @PostConstruct
-    public void logEnvVars() {
-        String token = System.getenv("TELEGRAM_BOT_TOKEN");
-        String username = System.getenv("TELEGRAM_BOT_USERNAME");
-
-        log.info("bot token : " + token);
-        log.info("bot username : " + username);
+    public void logProps() {
+        log.info("Spring prop botUsername: {}", botUsername);
+        log.info("Spring prop botToken: {}", botToken != null ? "OK" : "NULL");
     }
+
 
     public static void main(String[] args) {
         SpringApplication.run(TranscriberBotApplication.class, args);
