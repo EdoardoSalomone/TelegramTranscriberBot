@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @SpringBootApplication
@@ -17,8 +18,15 @@ public class TranscriberBotApplication {
     @Bean
     public TelegramBotsApi telegramBotsApi(TelegramBot telegramBot) throws TelegramApiException {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-        telegramBotsApi.registerBot(telegramBot);
-        System.out.println(">>> Bot registrato manualmente a Telegram <<<");
+        try {
+            telegramBotsApi.registerBot(telegramBot);
+        } catch (TelegramApiRequestException e) {
+            if (e.getApiResponse() != null && e.getApiResponse().contains("404")) {
+                System.out.println("Nessun webhook da rimuovere, avvio proseguito.");
+            } else {
+                throw e;
+            }
+        }
         return telegramBotsApi;
     }
 }
